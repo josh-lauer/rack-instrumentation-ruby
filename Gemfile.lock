@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rack-instrumentation (0.1.0.pre)
+    rack-instrumentation (0.1.0.pre2)
       opentracing (~> 0.5.0)
 
 GEM

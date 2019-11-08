@@ -18,29 +18,33 @@ module Rack
 
       def call(env)
         tracer.start_active_span(*span_args(env)) do |scope|
-          span = scope.span
-          env['rack.span'] = span
-
-          app.call(env).tap do |status_code, _headers, _body|
-            span.set_tag('http.status_code', status_code)
-
-            route = route_from_env(env)
-            span.operation_name = route if route
-          end
-        rescue StandardError => e
-          span.set_tag('error', true)
-          span.log_kv(
-            event: 'error',
-            :'error.kind' => e.class.to_s,
-            :'error.object' => e,
-            message: e.message,
-            stack: e.backtrace.join("\n")
-          )
-          raise
+          trace_request(env, scope)
         end
       end
 
       private
+    
+      def trace_request(env, scope)
+        span = scope.span
+        env['rack.span'] = span
+
+        app.call(env).tap do |status_code, _headers, _body|
+          span.set_tag('http.status_code', status_code)
+
+          route = route_from_env(env)
+          span.operation_name = route if route
+        end
+      rescue StandardError => e
+        span.set_tag('error', true)
+        span.log_kv(
+          event: 'error',
+          :'error.kind' => e.class.to_s,
+          :'error.object' => e,
+          message: e.message,
+          stack: e.backtrace.join("\n")
+        )
+        raise
+      end
 
       def span_args(env)
         method = env["REQUEST_METHOD"]
@@ -50,7 +54,7 @@ module Rack
           method,
           child_of: context,
           tags: {
-            'component' => 'rack',
+            'component' => 'ruby-rack',
             'span.kind' => 'server',
             'http.method' => method,
             'http.url' => env["REQUEST_URI"]

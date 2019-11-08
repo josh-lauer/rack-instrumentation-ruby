@@ -1,6 +1,6 @@
 # rack-instrumentation
 
-Open Tracing instrumentation for [rack](https://github.com/rack/rack). By default it starts a new span for every request and follows the open tracing tagging [semantic conventions](https://opentracing.io/specification/conventions)
+Open Tracing instrumentation for [rack](https://github.com/rack/rack). By default it starts a new span for every request and follows the open tracing tagging [semantic conventions](https://opentracing.io/specification/conventions). This is inspired by the [rack-tracer](https://github.com/opentracing-contrib/ruby-rack-tracer) gem, and sections of the code here are taken from there.
 
 ## Installation
 

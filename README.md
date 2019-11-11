@@ -1,13 +1,13 @@
 # rack-instrumentation
 
-Open Tracing instrumentation for [rack](https://github.com/rack/rack). By default it starts a new span for every request and follows the open tracing tagging [semantic conventions](https://opentracing.io/specification/conventions)
+Open Tracing instrumentation for [rack](https://github.com/rack/rack). By default it starts a new span for every request and follows the open tracing tagging [semantic conventions](https://opentracing.io/specification/conventions). This is inspired by the [rack-tracer](https://github.com/opentracing-contrib/ruby-rack-tracer) gem, and sections of the code here are taken from there.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rack-instrumentation'
+gem "rack-instrumentation"
 ```
 
 And then execute:
@@ -21,13 +21,20 @@ Or install it yourself as:
 ## Usage
 
 Require the gem (Note: this won't automatically instrument rack)
-```
-require "httprb-opentracing"
+```ruby
+require "rack/instrumentation"
 ```
 
-If you have set up `OpenTracing.global_tracer` you can turn on spans for all requests with just:
+If you have set up `OpenTracing.global_tracer` you can turn on spans for all requests in your `config.ru` thusly:
+```ruby
+use Rack::OpenTracing::Tracer
 ```
-    Rack::Tracer.instrument
+
+Similarly, this works for rails applications:
+```ruby
+Rails.application.configure do
+  config.middleware.use Rack::Instrumentation::Tracer
+end
 ```
 
 ## Development

@@ -66,7 +66,7 @@ module Rack
         rails_controller = env['action_controller.instance']
 
         if rails_controller
-          "#{env["REQUEST_METHOD"]} #{rails_controller.controller_name}/#{rails_controller.action_name}"
+          "#{env["REQUEST_METHOD"]} #{rails_controller.class.name}##{rails_controller.action_name}"
         end
       end
     end

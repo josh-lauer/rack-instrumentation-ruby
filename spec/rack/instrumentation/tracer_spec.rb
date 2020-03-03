@@ -11,16 +11,26 @@ RSpec.describe Rack::Instrumentation::Tracer do
 
   let(:method) { 'POST' }
 
+  let(:controller_instance) do
+    klass = Class.new do
+      def self.name
+        'MyController'
+      end
+    end
+    instance = double('UsersController',
+                      controller_name: 'users',
+                      action_name: 'create')
+    allow(instance).to receive(:class).and_return(klass)
+
+    instance
+  end
+
   shared_examples 'calls on_start_span and on_finish_span callbacks' do
     context 'when env has action_controller.instance set' do
-      let(:route) { 'POST users/create' }
+      let(:route) { 'POST MyController#create' }
 
       before do
-        # rubocop:disable RSpec/VerifiedDoubles - not going to pull the whole rails as devel dependency for this
-        env['action_controller.instance'] = double('UsersController',
-                                                   controller_name: 'users',
-                                                   action_name: 'create')
-        # rubocop:enable RSpec/VerifiedDoubles
+        env['action_controller.instance'] = controller_instance
       end
 
       it 'adds the controller/action to operation name' do

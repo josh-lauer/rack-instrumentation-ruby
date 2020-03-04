@@ -30,6 +30,7 @@ module Rack
 
         app.call(env).tap do |status_code, _headers, _body|
           span.set_tag('http.status_code', status_code)
+          span.set_tag('error', true) if status_code >= 500 && status_code < 600
 
           route = route_from_env(env)
           span.operation_name = route if route

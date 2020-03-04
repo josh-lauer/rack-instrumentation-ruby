@@ -4,6 +4,7 @@ require 'timeout'
 RSpec.describe Rack::Instrumentation::Tracer do
   let(:tracer) { OpenTracingTestTracer.build }
   let(:ok_response) { [200, { 'Content-Type' => 'application/json' }, ['{"ok": true}']] }
+  let(:internal_error_response) { [500, { 'Content-Type' => 'application/json' }, ['{"error": true}']] }
 
   let(:env) do
     Rack::MockRequest.env_for('/test/this/route', method: method)
@@ -65,6 +66,15 @@ RSpec.describe Rack::Instrumentation::Tracer do
         expect(tracer.active_span).to eq(span)
         ok_response
       end
+    end
+
+    it 'sets the error tag if a 500 status code is returned' do
+      respond_with { internal_error_response }
+
+      expect(tracer.spans.count).to eq(1)
+      span = tracer.spans[0]
+      expect(span).to be_finished
+      expect(span.tags).to include('error' => true)
     end
   end
 
